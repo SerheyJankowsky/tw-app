@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -16,7 +17,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <Script
+          type="text/javascript"
+          src="/tradingview/charting_library.standalone.js"
+          strategy="beforeInteractive"
+        ></Script>
+        <Script
+          type="text/javascript"
+          src="/tradingview/datafeeds/udf/dist/bundle.js"
+          strategy="beforeInteractive"
+        ></Script>
+        {children}
+      </body>
     </html>
   );
 }

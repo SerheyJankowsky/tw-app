@@ -1,0 +1,7 @@
+.tradingview_wrapper {
+  & .chart {
+    height: 50vh;
+    width: 100%;
+  }
+  // transform: scale(var(--scale-value));
+}
