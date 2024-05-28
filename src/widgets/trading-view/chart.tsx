@@ -11,7 +11,7 @@ const defaultWidgetProps = {
   interval: "1D",
   library_path: "/tradingview/",
   locale: "en",
-  base_url: "http://192.168.0.109:80",
+  base_url: process.env.UDF_LOCAL,
   charts_storage_url: "https://saveload.tradingview.com",
   charts_storage_api_version: "1.1",
   client_id: "tradingview.com",
