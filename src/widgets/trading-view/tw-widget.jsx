@@ -25,7 +25,7 @@ export default function TradingViewWidget({ order }) {
     }
 
     tvScriptLoadingPromise.then(
-      () => onLoadScriptRef.current && onLoadScriptRef.current()
+      () => onLoadScriptRef.current && onLoadScriptRef.current(),
     );
 
     return () => (onLoadScriptRef.current = null);
@@ -104,7 +104,7 @@ export default function TradingViewWidget({ order }) {
           },
         }));
         // console.log(widget.chart);
-        widget.ready((e) => {
+        widget.ready(() => {
           console.log(widget.chart);
         });
         // widget.ready((e) => {

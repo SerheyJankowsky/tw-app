@@ -16,8 +16,8 @@ import {
   SearchSymbolsCallback,
   ServerTimeCallback,
   SubscribeBarsCallback,
-  TimescaleMark,
   SymbolResolveExtension,
+  TimescaleMark,
   VisiblePlotsSet,
 } from "../../../datafeed-api";
 
@@ -34,11 +34,11 @@ import {
   PeriodParamsWithOptionalCountback,
 } from "./history-provider";
 
-import { IQuotesProvider } from "./iquotes-provider";
 import { DataPulseProvider } from "./data-pulse-provider";
+import { IQuotesProvider } from "./iquotes-provider";
 import { QuotesPulseProvider } from "./quotes-pulse-provider";
-import { SymbolsStorage } from "./symbols-storage";
 import { Requester } from "./requester";
+import { SymbolsStorage } from "./symbols-storage";
 
 export interface UdfCompatibleConfiguration extends DatafeedConfiguration {
   // tslint:disable:tv-variable-name
@@ -99,17 +99,17 @@ type UdfDatafeedTimescaleMark = UdfDatafeedMarkType<TimescaleMark>;
 function extractField<Field extends keyof Mark>(
   data: UdfDatafeedMark,
   field: Field,
-  arrayIndex: number,
+  arrayIndex: number
 ): Mark[Field];
 function extractField<Field extends keyof TimescaleMark>(
   data: UdfDatafeedTimescaleMark,
   field: Field,
-  arrayIndex: number,
+  arrayIndex: number
 ): TimescaleMark[Field];
 function extractField<T, TField extends keyof T>(
   data: T,
   field: TField,
-  arrayIndex: number,
+  arrayIndex: number
 ): T[TField] {
   const value = data[field];
   return Array.isArray(value) ? value[arrayIndex] : value;
@@ -140,7 +140,7 @@ export class UDFCompatibleDatafeedBase
     datafeedURL: string,
     quotesProvider: IQuotesProvider,
     requester: Requester,
-    updateFrequency: number = 10 * 1000,
+    updateFrequency: number = 10 * 1000
   ) {
     this._datafeedURL = datafeedURL;
     this._requester = requester;
@@ -149,7 +149,7 @@ export class UDFCompatibleDatafeedBase
 
     this._dataPulseProvider = new DataPulseProvider(
       this._historyProvider,
-      updateFrequency,
+      updateFrequency
     );
     this._quotesPulseProvider = new QuotesPulseProvider(this._quotesProvider);
 
@@ -160,7 +160,7 @@ export class UDFCompatibleDatafeedBase
         }
 
         this._setupWithConfiguration(configuration);
-      },
+      }
     );
   }
 
@@ -173,7 +173,7 @@ export class UDFCompatibleDatafeedBase
   public getQuotes(
     symbols: string[],
     onDataCallback: QuotesCallback,
-    onErrorCallback: (msg: string) => void,
+    onErrorCallback: (msg: string) => void
   ): void {
     this._quotesProvider
       .getQuotes(symbols)
@@ -185,13 +185,13 @@ export class UDFCompatibleDatafeedBase
     symbols: string[],
     fastSymbols: string[],
     onRealtimeCallback: QuotesCallback,
-    listenerGuid: string,
+    listenerGuid: string
   ): void {
     this._quotesPulseProvider.subscribeQuotes(
       symbols,
       fastSymbols,
       onRealtimeCallback,
-      listenerGuid,
+      listenerGuid
     );
   }
 
@@ -204,7 +204,7 @@ export class UDFCompatibleDatafeedBase
     from: number,
     to: number,
     onDataCallback: GetMarksCallback<Mark>,
-    resolution: ResolutionString,
+    resolution: ResolutionString
   ): void {
     if (!this._configuration.supports_marks) {
       return;
@@ -241,8 +241,8 @@ export class UDFCompatibleDatafeedBase
       .catch((error?: string | Error) => {
         logMessage(
           `UdfCompatibleDatafeed: Request marks failed: ${getErrorMessage(
-            error,
-          )}`,
+            error
+          )}`
         );
         onDataCallback([]);
       });
@@ -253,7 +253,7 @@ export class UDFCompatibleDatafeedBase
     from: number,
     to: number,
     onDataCallback: GetMarksCallback<TimescaleMark>,
-    resolution: ResolutionString,
+    resolution: ResolutionString
   ): void {
     if (!this._configuration.supports_timescale_marks) {
       return;
@@ -268,7 +268,7 @@ export class UDFCompatibleDatafeedBase
 
     this._send<TimescaleMark[] | UdfDatafeedTimescaleMark>(
       "timescale_marks",
-      requestParams,
+      requestParams
     )
       .then((response: TimescaleMark[] | UdfDatafeedTimescaleMark) => {
         if (!Array.isArray(response)) {
@@ -291,8 +291,8 @@ export class UDFCompatibleDatafeedBase
       .catch((error?: string | Error) => {
         logMessage(
           `UdfCompatibleDatafeed: Request timescale marks failed: ${getErrorMessage(
-            error,
-          )}`,
+            error
+          )}`
         );
         onDataCallback([]);
       });
@@ -313,8 +313,8 @@ export class UDFCompatibleDatafeedBase
       .catch((error?: string | Error) => {
         logMessage(
           `UdfCompatibleDatafeed: Fail to load server time, error=${getErrorMessage(
-            error,
-          )}`,
+            error
+          )}`
         );
       });
   }
@@ -323,7 +323,7 @@ export class UDFCompatibleDatafeedBase
     userInput: string,
     exchange: string,
     symbolType: string,
-    onResult: SearchSymbolsCallback,
+    onResult: SearchSymbolsCallback
   ): void {
     if (this._configuration.supports_search) {
       const params: RequestParams = {
@@ -339,7 +339,7 @@ export class UDFCompatibleDatafeedBase
             logMessage(
               `UdfCompatibleDatafeed: search symbols error=${
                 (response as any).errmsg
-              }`,
+              }`
             );
             onResult([]);
             return;
@@ -350,15 +350,15 @@ export class UDFCompatibleDatafeedBase
         .catch((reason?: string | Error) => {
           logMessage(
             `UdfCompatibleDatafeed: Search symbols for '${userInput}' failed. Error=${getErrorMessage(
-              reason,
-            )}`,
+              reason
+            )}`
           );
           onResult([]);
         });
     } else {
       if (this._symbolsStorage === null) {
         throw new Error(
-          "UdfCompatibleDatafeed: inconsistent configuration (symbols storage)",
+          "UdfCompatibleDatafeed: inconsistent configuration (symbols storage)"
         );
       }
 
@@ -367,7 +367,7 @@ export class UDFCompatibleDatafeedBase
           userInput,
           exchange,
           symbolType,
-          Constants.SearchItemsLimit,
+          Constants.SearchItemsLimit
         )
         .then(onResult)
         .catch(onResult.bind(null, []));
@@ -378,7 +378,7 @@ export class UDFCompatibleDatafeedBase
     symbolName: string,
     onResolve: ResolveCallback,
     onError: ErrorCallback,
-    extension?: SymbolResolveExtension,
+    extension?: SymbolResolveExtension
   ): void {
     logMessage("Resolve requested");
 
@@ -475,15 +475,15 @@ export class UDFCompatibleDatafeedBase
         .catch((reason?: string | Error) => {
           logMessage(
             `UdfCompatibleDatafeed: Error resolving symbol: ${getErrorMessage(
-              reason,
-            )}`,
+              reason
+            )}`
           );
           onError("unknown_symbol");
         });
     } else {
       if (this._symbolsStorage === null) {
         throw new Error(
-          "UdfCompatibleDatafeed: inconsistent configuration (symbols storage)",
+          "UdfCompatibleDatafeed: inconsistent configuration (symbols storage)"
         );
       }
 
@@ -499,7 +499,7 @@ export class UDFCompatibleDatafeedBase
     resolution: ResolutionString,
     periodParams: PeriodParamsWithOptionalCountback,
     onResult: HistoryCallback,
-    onError: ErrorCallback,
+    onError: ErrorCallback
   ): void {
     this._historyProvider
       .getBars(symbolInfo, resolution, periodParams)
@@ -514,13 +514,13 @@ export class UDFCompatibleDatafeedBase
     resolution: ResolutionString,
     onTick: SubscribeBarsCallback,
     listenerGuid: string,
-    onResetCacheNeededCallback: () => void,
+    onResetCacheNeededCallback: () => void
   ): void {
     this._dataPulseProvider.subscribeBars(
       symbolInfo,
       resolution,
       onTick,
-      listenerGuid,
+      listenerGuid
     );
   }
 
@@ -533,11 +533,11 @@ export class UDFCompatibleDatafeedBase
       (reason?: string | Error) => {
         logMessage(
           `UdfCompatibleDatafeed: Cannot get datafeed configuration - use default, error=${getErrorMessage(
-            reason,
-          )}`,
+            reason
+          )}`
         );
         return null;
-      },
+      }
     );
   }
 
@@ -546,7 +546,7 @@ export class UDFCompatibleDatafeedBase
   }
 
   private _setupWithConfiguration(
-    configurationData: UdfCompatibleConfiguration,
+    configurationData: UdfCompatibleConfiguration
   ): void {
     this._configuration = configurationData;
 
@@ -559,7 +559,7 @@ export class UDFCompatibleDatafeedBase
       !configurationData.supports_group_request
     ) {
       throw new Error(
-        "Unsupported datafeed configuration. Must either support search, or support group request",
+        "Unsupported datafeed configuration. Must either support search, or support group request"
       );
     }
 
@@ -570,14 +570,14 @@ export class UDFCompatibleDatafeedBase
       this._symbolsStorage = new SymbolsStorage(
         this._datafeedURL,
         configurationData.supported_resolutions || [],
-        this._requester,
+        this._requester
       );
     }
 
     logMessage(
       `UdfCompatibleDatafeed: Initialized with ${JSON.stringify(
-        configurationData,
-      )}`,
+        configurationData
+      )}`
     );
   }
 }

@@ -1,14 +1,12 @@
 "use client";
 
+import { Datafeed } from "@/classes/DataFees";
+import { useSocketConnection } from "@/shared/hooks/useSocketConnection";
 import { useEffect, useRef } from "react";
 
-const API_KEY = "neKQsvlDZgotALnOHZOkbuTpJOmspKw5";
-const DATAFEED =
-  "https://api.polygon.io/v2/aggs/ticker/AAPL/range/1/day/2023-01-08/2023-01-09?adjusted=true&sort=asc&limit=120&apiKey=neKQsvlDZgotALnOHZOkbuTpJOmspKw5";
-
 const defaultWidgetProps = {
-  symbol: "BTCUSDT",
-  interval: "1D",
+  symbol: "ETHUSDT",
+  interval: "15",
   library_path: "/tradingview/",
   locale: "en",
   base_url: process.env.UDF_LOCAL,
@@ -23,26 +21,23 @@ const defaultWidgetProps = {
 
 const Chart = () => {
   const chartContainerRef = useRef();
+  const candleSeriesRef = useRef();
   const props = defaultWidgetProps;
-
+  useSocketConnection();
   useEffect(() => {
     const widgetOptions = {
       symbol: props.symbol,
       // BEWARE: no trailing slash is expected in feed URL
-      //@ts-ignore
-      datafeed: new window.Datafeeds.UDFCompatibleDatafeed(
-        defaultWidgetProps.base_url,
-        defaultWidgetProps.intervalUpdateChart,
-        {
-          maxResponseLength: 1000,
-          expectedOrder: "latestFirst",
-        }
-      ),
+      // @ts-ignore
+      datafeed: new Datafeed(),
       interval: props.interval,
       container: chartContainerRef.current,
       library_path: props.library_path,
       locale: props.locale,
-      disabled_features: ["use_localstorage_for_settings"],
+      disabled_features: [
+        "use_localstorage_for_settings",
+        "header_symbol_search",
+      ],
       enabled_features: ["study_templates"],
       charts_storage_url: props.charts_storage_url,
       charts_storage_api_version: props.charts_storage_api_version,
@@ -80,6 +75,18 @@ const Chart = () => {
       tvWidget.remove();
     };
   }, [props]);
+
+  // useEffect(() => {
+  //   let listener = (data: any) => {
+  //     console.log("Data received from server:", data);
+  //   };
+  //   // socket.emit("subscribe", "BTCUSDT_1m");
+  //   socket.subscribe("candle", listener);
+  //   return () => {
+  //     // socket.unsubscribe("candle", listener);
+  //     socket.emit("unsubscribe", "BTCUSDT_1m");
+  //   };
+  // }, []);
 
   return (
     <>

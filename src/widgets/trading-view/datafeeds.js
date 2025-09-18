@@ -1,42 +1,26 @@
 const datafeed = {
-  onReady: (callback) => {
+  onReady: () => {
     console.log("[onReady]: Method call");
   },
-  searchSymbols: (userInput, exchange, symbolType, onResultReadyCallback) => {
+  searchSymbols: () => {
     console.log("[searchSymbols]: Method call");
   },
-  resolveSymbol: async (
-    symbolName,
-    onSymbolResolvedCallback,
-    onResolveErrorCallback
-  ) => {
+  resolveSymbol: async (symbolName) => {
     console.log("[resolveSymbol]: Method call", symbolName);
   },
-  getBars: (
-    symbolInfo,
-    resolution,
-    periodParams,
-    onHistoryCallback,
-    onErrorCallback
-  ) => {
+  getBars: (symbolInfo) => {
     console.log("[getBars]: Method call", symbolInfo);
   },
-  subscribeBars: (
-    symbolInfo,
-    resolution,
-    onRealtimeCallback,
-    subscribeUID,
-    onResetCacheNeededCallback
-  ) => {
+  subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscribeUID) => {
     console.log(
       "[subscribeBars]: Method call with subscribeUID:",
-      subscribeUID
+      subscribeUID,
     );
   },
   unsubscribeBars: (subscriberUID) => {
     console.log(
       "[unsubscribeBars]: Method call with subscriberUID:",
-      subscriberUID
+      subscriberUID,
     );
   },
 };
